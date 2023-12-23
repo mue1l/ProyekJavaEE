@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Request IB</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+        }
+        h1 {
+            color: #3f51b5;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 30px;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+        textarea,
+        input[type="date"],
+        input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #3f51b5;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var userId = /*[[${session.user.id}]]*/ null;
+        /*]]>*/
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Request IB</h1>
+        <form>
+            <div class="form-group">
+                <label for="keperluan">Keperluan:</label>
+                <textarea class="form-control" id="keperluan" placeholder="Keperluan"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="tanggal">Tanggal:</label>
+                <input type="date" class="form-control" id="tanggal">
+            </div>
+            <div class="form-group">
+                <label for="jam">Jam:</label>
+                <input type="time" class="form-control" id="jam">
+            </div>
+            <div class="form-group">
+                <label for="kembali">Tanggal Kembali:</label>
+                <input type="date" class="form-control" id="kembali">
+            </div>
+            <button type="button" class="btn btn-primary">Request</button>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $("button").click(function() {
+                var keperluan = $("#keperluan").val();
+                var tanggal = $("#tanggal").val();
+                var kembali = $("#kembali").val();
+                var jam = $("#jam").val();
+
+                var userModel = {
+                    "idUser": userId,
+                    "keperluan": keperluan,
+                    "tanggal": tanggal,
+                    "jam": jam + ":00",
+                    "kembali": kembali,
+                    "status": 0
+                };
+
+                var requestJSON = JSON.stringify(userModel);
+
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:8080/izinBermalam/mahasiswa/add/",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    data: requestJSON,
+                    success: function(data) {
+                        window.location.href = "/mahasiswa/ib/index";
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        // Handle error here
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

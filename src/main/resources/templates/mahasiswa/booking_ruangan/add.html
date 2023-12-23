@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var userId = /*[[${session.user.id}]]*/ null;
+        /*]]>*/
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Booking Ruangan</h1>
+        <h4>Total : <span th:text="${ruangan.namaRuangan}" th:attr="data-ruangan-id=${ruangan.id}"></span></h4>
+        <!-- Display error message if present -->
+        <form>
+            <div class="form-group">
+                <label for="nama">Keperluan:</label>
+                <textarea class="form-control" id="keperluan" placeholder="Keperluan"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="deskripsi">Tanggal:</label>
+                <input type="date" class="form-control" id="tanggal">
+            </div>
+            <div class="form-group">
+                <label for="deskripsi">Jam:</label>
+                <input type="time" class="form-control" id="jam">
+            </div>
+            <div class="form-group">
+                <label for="deskripsi">Waktu:</label>
+                <input type="number" class="form-control" id="waktu">
+            </div>
+            <button type="button" class="btn btn-primary">Request</button>
+        </form>
+    </div>
+    <script>
+    $(document).ready(function() {
+        $("button").click(function() {
+        	var ruanganId = $("span[data-ruangan-id]").data("ruangan-id");
+            var keperluan = $("#keperluan").val();
+            var tanggal = $("#tanggal").val();
+            var jam = $("#jam").val();
+            var waktu = $("#waktu").val();
+
+            var userModel = {
+                "idUser": userId,
+                "idRuangan": ruanganId,
+                "keperluan": keperluan,
+                "tanggal": tanggal,
+                "jam": jam + ':00',
+                "waktu":waktu,
+                "status": 0
+            };
+
+            var requestJSON = JSON.stringify(userModel);
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/bookingRuangan/mahasiswa/book",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                data: requestJSON,
+                success: function(data) {
+                    window.location.href = "/mahasiswa/bookingRuangan/indexBooking";
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    // Handle error here
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

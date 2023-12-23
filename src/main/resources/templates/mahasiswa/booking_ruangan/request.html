@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://ajax.googleapis.com/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Booking Ruangan</h1>
+
+        <form id="bookingForm" th:action="@{'/bookingRuangan/mahasiswa/book'}" method="post" th:object="${bookingRuangan}">
+            <input type="hidden" th:field="*{id}">
+            <div class="form-group">
+                <label for="ruangan">Ruangan :</label>
+                <select th:field="*{idRuangan}" class="form-control">
+                    <option th:each="ruangan : ${ruanganList}" 
+                            th:value="${ruangan.id}"
+                            th:text="${ruangan.namaRuangan}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="nama">Keperluan :</label>
+                <textarea class="form-control" id="keperluan" th:field="*{keperluan}"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="deskripsi">Tanggal:</label>
+                <input type="date" class="form-control" id="tanggal" th:field="*{tanggal}">
+            </div>
+            
+            <div class="form-group">
+                <label for="deskripsi">Jam:</label>
+                <input type="time" class="form-control" id="jam" th:field="*{jam}" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="deskripsi">Jam:</label>
+                <input type="number" class="form-control" id="waktu" th:field="*{waktu}">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="submitForm()">Simpan</button>
+        </form>
+    </div>
+
+    <script>
+    function submitForm() {
+        var formData = {
+            idRuangan: $('#idRuangan').val(),
+            keperluan: $('#keperluan').val(),
+            tanggal: $('#tanggal').val(),
+            jam: $('#jam').val(),
+            waktu: $('#waktu').val()
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/bookingRuangan/mahasiswa/book',
+            contentType: 'application/json',  // Set content type to JSON
+            data: JSON.stringify(formData),  // Convert formData to JSON
+            success: function(response) {
+                // Handle success response
+                alert(response);
+            },
+            error: function(error) {
+                // Handle error response
+                alert('Error submitting the form.');
+            }
+        });
+    }
+
+    </script>
+</body>
+</html>

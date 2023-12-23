@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-image: url('login.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,.1);
+            background-color: rgba(255, 255, 255, 0.7); /* Opacity value (0.7) can be adjusted */
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-outline {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 0.5rem;
+        }
+
+        .btn-outline-light {
+            border-radius: 1.5rem;
+        }
+
+        .register-link {
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card">
+                    <div class="card-body text-center">
+
+                        <h2 class="fw-bold mb-4">Login</h2>
+
+                        <form th:action="@{/user/login}" method="POST" th:object="${user}">
+                            <div class="form-outline">
+                                <input type="text" th:field="*{username}" class="form-control" placeholder="Username"/>
+                            </div>
+                            <div class="form-outline">
+                                <input type="password" th:field="*{password}" class="form-control" placeholder="Password"/>
+                            </div>
+                            <button type="submit" class="btn btn-outline-light btn-lg mt-3">Login</button>
+                        </form>
+
+                        <p th:if="${error}" class="text-danger mt-3" th:text="${error}"></p>
+
+                        <p class="mt-4 mb-0">
+                            Belum memiliki akun? 
+                            <a href="view-register" class="register-link">Registrasi</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Daftar Booking Ruangan Saya</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Mendengarkan peristiwa saat pengguna mengetikkan sesuatu
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#viewDataUsers tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            loadUserData();
+
+            function loadUserData() {
+                $.getJSON("http://localhost:8080/bookingRuangan/mahasiswa", function (results) {
+                    console.log("Response from server:", results);
+
+                    // Check if the result is an array
+                    if (Array.isArray(results)) {
+                        var promises = [];
+
+                        results.forEach(function (result, index) {
+                            var promise = new Promise(function (resolve) {
+                                fetchRoomInformation(result.idRuangan, function (roomData) {
+                                    resolve({
+                                        roomData: roomData,
+                                        result: result
+                                    });
+                                });
+                            });
+
+                            promises.push(promise);
+                        });
+
+                        // Wait for all promises to resolve before updating the HTML
+                        Promise.all(promises).then(function (combinedResults) {
+                            var data = '';
+
+                            combinedResults.forEach(function (combinedResult, index) {
+                                var rowNumber = index + 1; // Start with the first row
+                                var result = combinedResult.result;
+                                var roomData = combinedResult.roomData;
+
+                                // Convert result.jam to a string in the format "HH:mm"
+                                var jamString = result.jam.toString().slice(0, 5);
+
+                                // Split hours and minutes
+                                var [hours, minutes] = jamString.split(":").map(Number);
+
+                                // Add result.waktu hours to the existing time
+                                hours += result.waktu;
+
+                                // Format the resulting time
+                                var jamSelesai = ("0" + hours).slice(-2) + ":" + ("0" + minutes).slice(-2);
+
+                                data += "<tr><td>" + rowNumber + "</td><td>" +
+                                    (roomData ? roomData.namaRuangan : 'Nama Ruangan Tidak Tersedia') + "</td><td>" +
+                                    result.keperluan + "</td><td>" +
+                                    result.tanggal + "</td><td>" +
+                                    jamString + "</td><td>" +
+                                    jamSelesai + "</td><td>";
+
+                                // Check the status and apply conditional formatting
+                                if (result.status === 1) {
+                                    data += "<span class='text-success'>Approved</span>";
+                                } else {
+                                    data += "<span class='text-danger'>Menunggu</span>";
+                                }
+
+                                data += "</td><td>" +
+                                    "<a class='btn btn-warning' href='/mahasiswa/bookingRuangan/edit/" + result.id + "'>Edit</a>" +
+                                    "<a class='btn btn-danger ml-2' data-bookingruangan-id='" + result.id + "'>Hapus</a></td></tr>";
+                            });
+
+                            // Append the HTML data to the table
+                            $("#viewDataUsers").html(data);
+
+                        });
+                    } else {
+                        console.error("Expected an array, but got:", results);
+                    }
+                })
+                .fail(function () {
+                    console.error("Error fetching data");
+                });
+            }
+
+            $(document).on("click", ".btn-danger", function() {
+                var ruanganId = $(this).data('bookingruangan-id');
+                var isConfirmed = confirm("Apakah Anda yakin ingin menghapus booking ruangan ini?");
+                
+                if (isConfirmed) {
+                    window.location.href = "/bookingRuangan/mahasiswa/delete/" + ruanganId;
+                }
+            });
+        });
+
+        function fetchRoomInformation(roomId, callback) {
+            $.getJSON("http://localhost:8080/ruangan/" + roomId, function (roomData) {
+                callback(roomData);
+            })
+            .fail(function () {
+                console.error("Error fetching room information");
+                callback({});
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Daftar Booking Ruangan Saya</h1>
+        <a href="/mahasiswa/bookingRuangan/request" class="btn btn-primary">Booking Ruangan</a>
+        <br>
+        <input type="text" id="searchInput" placeholder="Cari keperluan...">
+        <table id="viewDataUsers" class="table table-bordered mt-3">
+            <tr>
+                <th>No</th>
+                <th>Nama Ruangan</th>
+                <th>Keperluan</th>
+                <th>Tanggal</th>
+                <th>Jam Mulai</th>
+                <th>Jam Selesai</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

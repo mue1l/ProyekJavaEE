@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <meta charset="ISO-8859-1"/>
+    <title>View Users</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link untuk Font Awesome -->
+    <style>
+        /* CSS yang telah dibuat sebelumnya */
+        
+        /* Tambahkan gaya flexbox untuk tautan */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        a {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        .icon {
+            margin-right: 10px;
+        }
+        .navbar {
+            background-color: #007bff; /* Warna latar belakang */
+            color: white; /* Warna teks */
+        }
+
+        .navbar a {
+            color: white; /* Warna teks tautan */
+        }
+
+        .navbar a:hover {
+            color: #fff; /* Warna teks tautan saat dihover */
+        }
+    </style>
+</head>
+<body>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <h1 class="mt-4 navbar-brand">Selamat Datang, Admin</span></h1>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/izinBermalam/index"><i class="fas fa-bed icon"></i>Izin Bermalam</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/izinKeluar/index"><i class="fas fa-sign-out-alt icon"></i>Izin Keluar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/pembelianKaos/index"><i class="fas fa-tshirt icon"></i>Pemesanan Kaos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/ruangan/index"><i class="fas fa-door-open icon"></i>Booking Ruangan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/surat/index"><i class="fas fa-envelope icon"></i>Request Surat</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

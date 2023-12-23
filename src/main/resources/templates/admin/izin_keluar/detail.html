@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://ajax.googleapis.com/libs/jquery/3.2.1/jquery.min.js"></script>
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+        }
+        h1 {
+            color: #3f51b5;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 30px;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+        textarea,
+        input[type="date"],
+        input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #3f51b5;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Detail IB</h1>
+
+        <div class="form-group">
+            <label for="nama">Nama :</label>
+            <p class="form-control" th:text="${nama}" id="nama"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="keperluan">Keperluan :</label>
+            <p class="form-control" th:text="${izinKeluar.keperluan}" id="keperluan"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="tanggal">Tanggal:</label>
+            <p class="form-control" th:text="${izinKeluar.tanggal}" id="tanggal"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="jam">Jam:</label>
+            <p class="form-control" th:text="${izinKeluar.jam}" id="jam"></p>
+        </div>
+        
+        <div class="form-group">
+            <label for="jam">Jam:</label>
+            <p class="form-control" th:text="${izinKeluar.jamKembali}" id="jamKembali"></p>
+        </div>
+
+        <form th:action="@{'/izinKeluar/admin/detail/' + ${izinKeluar.id}}" method="post" th:object="${izinKeluar}">
+            <button type="submit" name="action" value="approve" class="btn btn-primary">Approve</button>
+            <button type="submit" name="action" value="reject" class="btn btn-primary">Reject</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Assign values to HTML elements using jQuery
+            $('#nama').text(nama);
+            $('#keperluan').text(izinKeluar.keperluan);
+            $('#tanggal').text(izinKeluar.tanggal);
+            $('#jam').text(izinKeluar.jam);
+            $('#jamKembali').text(izinKeluar.jamKembali);
+        });
+    </script>
+</body>
+</html>

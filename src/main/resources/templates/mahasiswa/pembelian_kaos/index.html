@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>View Users</title>
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 60%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #3f51b5;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 30px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #3f51b5;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var userId = /*[[${session.user.id}]]*/ null;
+        /*]]>*/
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Mendengarkan peristiwa saat pengguna mengetikkan sesuatu
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#viewDataUsers tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            loadUserData();
+
+            function loadUserData() {
+                // Fungsi untuk mengambil dan menampilkan semua data
+                $.getJSON("http://localhost:8080/pembelianKaos/mahasiswa", function (results) {
+                    console.log("Response from server:", results);
+
+                    // Check if the result is an array
+                    if (Array.isArray(results)) {
+                        var data = '';
+                        var promises = [];
+
+                        function fetchUserInformation(userId, callback) {
+                            // Fetch user information based on userId
+                            $.ajax({
+                                url: "http://localhost:8080/user/" + userId,
+                                method: "GET",
+                                success: callback,
+                                error: function () {
+                                    console.error("Error fetching user information");
+                                }
+                            });
+                        }
+
+                        // Iterate through the array of results
+                        results.forEach(function (result, index) {
+                            var rowNumber = index + 1; // Start with the first row
+
+                            // Fetch user information based on userId asynchronously
+                            var promise = new Promise(function (resolve) {
+                                fetchUserInformation(result.idUser, function (userData) {
+                                    var userName = userData.nama; // Adjust property based on your actual data structure
+
+                                    // Map ukuran values to corresponding sizes
+                                    var sizeMap = {
+                                        1: 'S',
+                                        2: 'M',
+                                        3: 'L',
+                                        4: 'XL',
+                                        5: 'XXL'
+                                        // Add more mappings if needed
+                                    };
+
+                                    // Get the size based on result.ukuran
+                                    var size = sizeMap[result.ukuran] || 'Unknown';
+
+                                    data += "<tr><td>" + rowNumber + "</td><td>" +
+                                        userName + "</td><td>" +
+                                        size + "</td><td>" +
+                                        result.jumlah + "</td><td>" +
+                                        result.total + "</td><td>";
+
+                                    // Check the status and apply conditional formatting
+                                   if (result.status === 1) {
+									    data += "<span class='text-success'>Sudah Dibayar</span>";
+									} else {
+									    data += "<span class='text-danger'>Belum Dibayar</span>";
+									    // Only show the "Bayar" button if the status is not 1
+									    data += "</td><td>" +
+									        "<a class='btn btn-info' href='/mahasiswa/pembelianKaos/bayar/" + result.id + "'>Bayar</a>" +
+									        "<a class='btn btn-warning' href='/mahasiswa/pembelianKaos/edit/" + result.id + "'>Edit</a>" +
+									        "<a class='btn btn-danger ml-2' data-pembelianKaos-id='" + result.id + "'>Hapus</a></td></tr>";
+									}
+
+                                    resolve();
+                            });
+
+                            });
+
+                            promises.push(promise);
+                        });
+
+                        // Wait for all promises to resolve before updating the HTML
+                        Promise.all(promises).then(function () {
+                            // Append the HTML data to the table
+                            $("#viewDataUsers").html(data);
+                        });
+                    } else {
+                        console.error("Expected an array, but got:", results);
+                    }
+                })
+                .fail(function () {
+                    console.error("Error fetching data");
+                });
+            }
+
+
+
+            $(document).on("click", ".btn-danger", function() {
+                // Ambil id dari tombol hapus yang diklik
+                var ruanganId = $(this).data('pembeliankaos-id');
+
+                // Tampilkan konfirmasi alert
+                var isConfirmed = confirm("Apakah Anda yakin ingin menghapus Pemesanan ini?");
+
+                // Jika pengguna mengkonfirmasi, lakukan penghapusan
+                if (isConfirmed) {
+                    window.location.href = "/pembelianKaos/mahasiswa/delete/" + ruanganId;
+                }
+            });
+            });
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-4">Daftar Pesanan</h1>
+    <a href="/mahasiswa/pembelianKaos/add" class="btn btn-primary">Pesan</a>
+    <br>
+    <h4 class="mt-4">Daftar Pesanan</h4>
+    <table id="viewDataUsers" class="table table-bordered mt-3">
+        <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Ukuran</th>
+            <th>Jumlah</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

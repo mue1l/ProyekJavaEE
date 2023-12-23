@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Daftar Request Surat Saya</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 60%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #3f51b5;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 30px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #3f51b5;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Mendengarkan peristiwa saat pengguna mengetikkan sesuatu
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#viewDataUsers tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            loadUserData();
+
+            function loadUserData() {
+                $.getJSON("http://localhost:8080/requestSurat/mahasiswa", function (results) {
+                    console.log("Response from server:", results);
+
+                    // Check if the result is an array
+                    if (Array.isArray(results)) {
+                        var promises = [];
+
+                        results.forEach(function (result, index) {
+                            var promise = new Promise(function (resolve) {
+                                fetchRoomInformation(result.idSurat, function (roomData) {
+                                    resolve({
+                                        roomData: roomData,
+                                        result: result
+                                    });
+                                });
+                            });
+
+                            promises.push(promise);
+                        });
+
+                        // Wait for all promises to resolve before updating the HTML
+                        Promise.all(promises).then(function (combinedResults) {
+                            var data = '';
+
+                            combinedResults.forEach(function (combinedResult, index) {
+                                var rowNumber = index + 1; // Start with the first row
+                                var result = combinedResult.result;
+                                var roomData = combinedResult.roomData;
+
+                                data += "<tr><td>" + rowNumber + "</td><td>" +
+                                    (roomData ? roomData.namaSurat : 'Nama Ruangan Tidak Tersedia') + "</td><td>" +
+                                    result.keperluan + "</td><td>";
+
+                                // Check the status and apply conditional formatting
+                                if (result.status === 1) {
+                                    data += "<span class='text-success'>Approved</span>";
+                                } else {
+                                    data += "<span class='text-danger'>Menunggu</span>";
+                                }
+
+                                data += "</td><td>" +
+                                    "<a class='btn btn-warning' href='/mahasiswa/requestSurat/edit/" + result.id + "'>Edit</a>" +
+                                    "<a class='btn btn-danger ml-2' data-requestSurat-id='" + result.id + "'>Hapus</a></td></tr>";
+                            });
+
+                            // Append the HTML data to the table
+                            $("#viewDataUsers").html(data);
+
+                        });
+                    } else {
+                        console.error("Expected an array, but got:", results);
+                    }
+                })
+                .fail(function () {
+                    console.error("Error fetching data");
+                });
+            }
+
+            $(document).on("click", ".btn-danger", function() {
+                var ruanganId = $(this).data('requestsurat-id');
+                var isConfirmed = confirm("Apakah Anda yakin ingin menghapus request surat ini?");
+                
+                if (isConfirmed) {
+                    window.location.href = "/requestSurat/mahasiswa/delete/" + ruanganId;
+                }
+            });
+        });
+
+        function fetchRoomInformation(roomId, callback) {
+            $.getJSON("http://localhost:8080/surat/" + roomId, function (roomData) {
+                callback(roomData);
+            })
+            .fail(function () {
+                console.error("Error fetching room information");
+                callback({});
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Daftar Request Surat Saya</h1>
+        <a href="/mahasiswa/requestSurat/request" class="btn btn-primary">Request Surat</a>
+        <br>
+        <input type="text" id="searchInput" placeholder="Cari keperluan...">
+        <table id="viewDataUsers" class="table table-bordered mt-3">
+            <tr>
+                <th>No</th>
+                <th>Surat</th>
+                <th>Keperluan</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tambah Barang</title>
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+        }
+        h1 {
+            color: #3f51b5;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 30px;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+        textarea,
+        input[type="date"],
+        input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #3f51b5;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Tambah Surat</h1>
+        <form>
+            <div class="form-group">
+                <label for="nama">Nama Surat:</label>
+                <input type="text" class="form-control" id="nama_surat" placeholder="Nama">
+            </div>
+            <div class="form-group">
+                <label for="deskripsi">Deskripsi Surat:</label>
+                <input type="text" class="form-control" id="deskripsi" placeholder="Deskripsi">
+            </div>
+            <button type="button" class="btn btn-primary">Tambah Surat</button>
+        </form>
+    </div>
+    <script>
+    $(document).ready(function() {
+        $("button").click(function() {
+            var nama_ruangan = document.getElementById("nama_surat").value;
+            var deskripsi_ruangan = document.getElementById("deskripsi").value;
+
+            var userModel = {
+                "namaSurat": nama_ruangan,
+                "deskripsi": deskripsi_ruangan
+            };
+
+            var requestJSON = JSON.stringify(userModel);
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/surat/",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                data: requestJSON,
+                success: function(data) {
+                    window.location.href = "/admin/surat/index/";
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    // Handle error here
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
